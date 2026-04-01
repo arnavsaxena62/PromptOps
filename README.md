@@ -1,8 +1,20 @@
 # PromptOps
 
-A tool for developing, testing, and comparing prompts across multiple AI models. Run the same prompt against different models, evaluate outputs with test cases, and find the best model for your use case.
+A web application for developing, testing, and comparing prompts across multiple AI models. Create prompt versions, run them against different models with test cases, and find the best model for your use case — all from your browser.
 
-## Setup
+> **Note:** The web UI is under development. The core engine is fully functional and can be used as a Python library today.
+
+## Features
+
+- **Multi-model comparison** — run the same prompt across multiple models simultaneously
+- **Test case evaluation** — define input/expected output pairs to validate prompt behavior
+- **Cost tracking** — automatic per-token pricing fetched from OpenRouter
+- **Performance metrics** — latency, token counts, and cost per run
+- **Prompt versioning** — iterate on prompts and compare versions
+
+## Using as a Python Library
+
+### Setup
 
 ```bash
 python -m venv venv
@@ -16,15 +28,7 @@ Create a `.env` file with your OpenRouter API key:
 OPENROUTER_API_KEY=your_key_here
 ```
 
-## Usage
-
-See `main.py` for a complete example. The workflow is:
-
-1. **Create a project** — a container for prompts, models, test cases, and runs
-2. **Add model configs** — specify which models to test (pricing is fetched automatically from OpenRouter)
-3. **Create a prompt version** — the system prompt template you want to evaluate
-4. **Add test cases** — pairs of input text and expected output for each prompt
-5. **Run and compare** — execute all test cases against all models and review results
+### Quick Start
 
 ```python
 from models import Project, PromptVersion, ModelConfig, TestCase
@@ -49,6 +53,8 @@ for result in run.results:
     print(f"{result.model_config.model_name}: {result.output_text}")
     print(f"  Latency: {result.latency_ms}ms, Cost: ${result.total_cost}")
 ```
+
+Run `python main.py` for a complete example with multiple test cases.
 
 ## Project Structure
 
