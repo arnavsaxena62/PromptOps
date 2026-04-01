@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from models.prompt_version import PromptVersion
+    from models.test_case import TestCase
     from models.model_config import ModelConfig
     from models.project import Project
 from models.run_result import RunResult
@@ -19,14 +19,14 @@ class Run:
     created_at: datetime
     results: list[RunResult]
 
-    def __init__(self, project: "Project", prompt_version: "PromptVersion", model_configs: list["ModelConfig"]):
+    def __init__(self, project: "Project", test_case: "TestCase", model_configs: list["ModelConfig"]):
         import uuid
         self.id = str(uuid.uuid4())
         self.project = project
         self.project_id = project.id
-        self.prompt_version = prompt_version
-        self.prompt_version_id = prompt_version.id
-        self.input_text = prompt_version.content
+        self.test_case = test_case
+        self.prompt_version_id = test_case.prompt_version_id
+        self.input_text = test_case.input_text
         self.model_configs = model_configs
         self.created_at = datetime.now()
         self.results = []

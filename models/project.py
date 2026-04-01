@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from models.project import Project
+    from models.test_case import TestCase
 from models.run import Run
 
 
@@ -13,15 +13,16 @@ class Project:
     name: str
     prompt_versions: list
     model_configs: list
+    test_cases: list
     runs: list[Run]
 
     def __init__(self, name: str):
         import uuid
-
         self.id = str(uuid.uuid4())
         self.name = name
         self.prompt_versions = []
         self.model_configs = []
+        self.test_cases = []
         self.runs = []
 
     def add_prompt_version(self, prompt_version) -> None:
@@ -34,9 +35,14 @@ class Project:
         model_config.project_id = self.id
         self.model_configs.append(model_config)
 
-    def create_run(self, prompt_version, model_configs: Optional[list] = None) -> Run:
+    def add_test_case(self, test_case) -> None:
+        test_case.project = self
+        test_case.project_id = self.id
+        self.test_cases.append(test_case)
+
+    def create_run(self, test_case: "TestCase", model_configs: Optional[list] = None) -> Run:
         configs = model_configs or self.model_configs
-        run = Run(self, prompt_version, configs)
+        run = Run(self, test_case, configs)
         run.execute()
         self.runs.append(run)
         return run
