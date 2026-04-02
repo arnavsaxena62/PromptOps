@@ -29,7 +29,17 @@ def main():
             prompt_version=prompt,
             input_text="Where is my order #12345?",
             expected_output="I can help you track your order. Let me look up order #12345 for you.",
-        )
+        ),
+        TestCase(
+            prompt_version=prompt,
+            input_text="My package arrived damaged, what should I do?",
+            expected_output="I'm sorry to hear that. Please provide your order number so I can help you file a claim.",
+        ),
+        TestCase(
+            prompt_version=prompt,
+            input_text="How long does standard shipping take?",
+            expected_output="Standard shipping typically takes 5-7 business days depending on your location.",
+        ),
     ]
 
     for tc in test_cases:

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useParams, Link } from "react-router-dom"
+import { useParams, Link, useNavigate } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { Sidebar } from "@/components/sidebar"
 import { Button } from "@/components/ui/button"
@@ -48,6 +48,7 @@ interface Project {
 
 export default function ProjectWorkspace() {
   const { projectId } = useParams<{ projectId: string }>()
+  const navigate = useNavigate()
   const [project, setProject] = useState<Project | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -55,7 +56,7 @@ export default function ProjectWorkspace() {
   const { versions, createVersion } = usePromptVersions(projectId!)
   const { configs, createConfig } = useModelConfigs(projectId!)
   const { testCases, createTestCase } = useTestCases(projectId!)
-  const { runs, executeRun } = useRuns(projectId!)
+  const { runs, executeBatchRun } = useRuns(projectId!)
 
   // Prompt editor state
   const [promptContent, setPromptContent] = useState("")
@@ -169,8 +170,10 @@ export default function ProjectWorkspace() {
     setIsRunning(true)
     try {
       const modelIds = selectedModelIds.size > 0 ? Array.from(selectedModelIds) : undefined
-      for (const testCaseId of selectedTestCaseIds) {
-        await executeRun(testCaseId, modelIds)
+      const newRuns = await executeBatchRun(Array.from(selectedTestCaseIds), modelIds)
+      if (newRuns.length > 0) {
+        const batchIds = newRuns.map((r) => r.id).join(",")
+        navigate(`/project/${projectId}/run/${newRuns[0].id}?batch=${batchIds}`)
       }
     } catch (err) {
       console.error("Failed to execute run:", err)

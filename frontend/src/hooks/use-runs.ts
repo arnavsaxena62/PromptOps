@@ -11,6 +11,7 @@ interface RunResult {
   total_cost: number
   success: boolean
   error_message: string | null
+  score: number
 }
 
 interface Run {
@@ -28,6 +29,7 @@ interface UseRunsResult {
   error: Error | null
   refetch: () => void
   executeRun: (test_case_id: string, model_config_ids?: string[]) => Promise<Run>
+  executeBatchRun: (test_case_ids: string[], model_config_ids?: string[]) => Promise<Run[]>
 }
 
 export function useRuns(projectId: string): UseRunsResult {
@@ -70,9 +72,26 @@ export function useRuns(projectId: string): UseRunsResult {
     return newRun
   }, [projectId])
 
+  const executeBatchRun = useCallback(async (test_case_ids: string[], model_config_ids?: string[]): Promise<Run[]> => {
+    const response = await fetch(`/projects/${projectId}/runs/batch`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ test_case_ids, model_config_ids }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to execute batch run: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    const newRuns: Run[] = data.runs
+    setRuns((prev) => [...newRuns, ...prev])
+    return newRuns
+  }, [projectId])
+
   useEffect(() => {
     fetchRuns()
   }, [fetchRuns])
 
-  return { runs, isLoading, error, refetch: fetchRuns, executeRun }
+  return { runs, isLoading, error, refetch: fetchRuns, executeRun, executeBatchRun }
 }

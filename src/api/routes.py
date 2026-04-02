@@ -22,10 +22,14 @@ from api.schemas import (
     RunCreate,
     RunResponse,
     RunResultResponse,
+    BatchRunCreate,
+    BatchRunResponse,
     OpenRouterModel,
 )
 
-app = FastAPI(title="PromptOps", description="Prompt development and model comparison API")
+app = FastAPI(
+    title="PromptOps", description="Prompt development and model comparison API"
+)
 
 
 @app.get("/projects", response_model=list[ProjectResponse])
@@ -54,7 +58,9 @@ def remove_project(project_id: str):
     return {"deleted": True}
 
 
-@app.post("/projects/{project_id}/prompt-versions", response_model=PromptVersionResponse)
+@app.post(
+    "/projects/{project_id}/prompt-versions", response_model=PromptVersionResponse
+)
 def add_prompt_version(project_id: str, body: PromptVersionCreate):
     project = get_project(project_id)
     if not project:
@@ -67,7 +73,9 @@ def add_prompt_version(project_id: str, body: PromptVersionCreate):
     return _pv_to_response(pv)
 
 
-@app.get("/projects/{project_id}/prompt-versions", response_model=list[PromptVersionResponse])
+@app.get(
+    "/projects/{project_id}/prompt-versions", response_model=list[PromptVersionResponse]
+)
 def list_prompt_versions(project_id: str):
     project = get_project(project_id)
     if not project:
@@ -82,13 +90,15 @@ def add_model_config(project_id: str, body: ModelConfigCreate):
         raise HTTPException(404, "Project not found")
     try:
         mc = ModelConfig(provider=body.provider, model_name=body.model_name)
+        project.add_model_config(mc)
     except ValueError as e:
         raise HTTPException(400, str(e))
-    project.add_model_config(mc)
     return _mc_to_response(mc)
 
 
-@app.get("/projects/{project_id}/model-configs", response_model=list[ModelConfigResponse])
+@app.get(
+    "/projects/{project_id}/model-configs", response_model=list[ModelConfigResponse]
+)
 def list_model_configs(project_id: str):
     project = get_project(project_id)
     if not project:
@@ -104,13 +114,15 @@ def list_available_models():
     result = []
     for m in models:
         pricing = m.get("pricing", {})
-        result.append(OpenRouterModel(
-            id=m["id"],
-            name=m.get("name", m["id"]),
-            context_length=m.get("context_length", 0),
-            prompt_cost_per_token=float(pricing.get("prompt", 0)),
-            completion_cost_per_token=float(pricing.get("completion", 0)),
-        ))
+        result.append(
+            OpenRouterModel(
+                id=m["id"],
+                name=m.get("name", m["id"]),
+                context_length=m.get("context_length", 0),
+                prompt_cost_per_token=float(pricing.get("prompt", 0)),
+                completion_cost_per_token=float(pricing.get("completion", 0)),
+            )
+        )
     return result
 
 
@@ -119,10 +131,16 @@ def add_test_case(project_id: str, body: TestCaseCreate):
     project = get_project(project_id)
     if not project:
         raise HTTPException(404, "Project not found")
-    pv = next((p for p in project.prompt_versions if p.id == body.prompt_version_id), None)
+    pv = next(
+        (p for p in project.prompt_versions if p.id == body.prompt_version_id), None
+    )
     if not pv:
         raise HTTPException(404, "Prompt version not found")
-    tc = TestCase(prompt_version=pv, input_text=body.input_text, expected_output=body.expected_output)
+    tc = TestCase(
+        prompt_version=pv,
+        input_text=body.input_text,
+        expected_output=body.expected_output,
+    )
     project.add_test_case(tc)
     return _tc_to_response(tc)
 
@@ -155,6 +173,34 @@ def execute_run(project_id: str, body: RunCreate):
     for result in run.results:
         result.evaluate()
     return _run_to_response(run)
+
+
+@app.post("/projects/{project_id}/runs/batch", response_model=BatchRunResponse)
+def execute_batch_runs(project_id: str, body: BatchRunCreate):
+    project = get_project(project_id)
+    if not project:
+        raise HTTPException(404, "Project not found")
+    test_cases = []
+    for tc_id in body.test_case_ids:
+        tc = next((t for t in project.test_cases if t.id == tc_id), None)
+        if not tc:
+            raise HTTPException(404, f"Test case {tc_id} not found")
+        test_cases.append(tc)
+    if body.model_config_ids:
+        configs = [mc for mc in project.model_configs if mc.id in body.model_config_ids]
+        if not configs:
+            raise HTTPException(404, "No matching model configs found")
+    else:
+        configs = project.model_configs
+    if not configs:
+        raise HTTPException(400, "No model configs available")
+    runs = []
+    for tc in test_cases:
+        run = project.create_run(tc, configs)
+        for result in run.results:
+            result.evaluate()
+        runs.append(_run_to_response(run))
+    return BatchRunResponse(runs=runs)
 
 
 @app.get("/projects/{project_id}/runs", response_model=list[RunResponse])
@@ -238,6 +284,7 @@ def _run_to_response(run) -> RunResponse:
                 total_cost=r.total_cost,
                 success=r.success,
                 error_message=r.error_message,
+                score=r.quality_score,
             )
             for r in run.results
         ],

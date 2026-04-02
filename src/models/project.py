@@ -33,6 +33,8 @@ class Project:
         self.prompt_versions.append(prompt_version)
 
     def add_model_config(self, model_config) -> None:
+        if any(mc.provider == model_config.provider and mc.model_name == model_config.model_name for mc in self.model_configs):
+            raise ValueError(f"Model config {model_config.provider}/{model_config.model_name} already exists")
         model_config.project = self
         model_config.project_id = self.id
         self.model_configs.append(model_config)

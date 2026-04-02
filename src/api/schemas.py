@@ -85,6 +85,7 @@ class RunResultResponse(BaseModel):
     total_cost: float
     success: bool
     error_message: Optional[str]
+    score: float
 
 
 class RunResponse(BaseModel):
@@ -97,6 +98,15 @@ class RunResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class BatchRunCreate(BaseModel):
+    test_case_ids: list[str]
+    model_config_ids: Optional[list[str]] = None
+
+
+class BatchRunResponse(BaseModel):
+    runs: list[RunResponse]
 
 
 class OpenRouterModel(BaseModel):
