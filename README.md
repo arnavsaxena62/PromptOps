@@ -1,163 +1,194 @@
-# PromptOps
+# 🔧 PromptOps
 
-A full-stack application for developing, testing, and comparing prompts across multiple AI models. Create prompt versions, run them against different models with test cases, and evaluate results — all from your browser.
+> A full-stack prompt engineering workbench for testing, evaluating, and optimizing prompts across multiple LLMs.
 
-## Tech Stack
+---
 
-**Backend**
-- Python 3 + FastAPI
-- Uvicorn
-- OpenAI SDK (via OpenRouter)
-- tiktoken, Pydantic, httpx
+## 🖼️ Preview
+
+![PromptOps Hero UI](./assets/hero.png)
+![PromptOps project view UI](./assets/hero2.png)
+
+---
+
+## 🚀 What is PromptOps?
+
+PromptOps is a developer-focused platform for **systematically improving prompts** instead of guessing what works.
+
+It allows you to:
+
+* Run prompts across multiple models
+* Compare outputs side-by-side
+* Evaluate responses using structured test cases
+* Track latency and cost
+* Version and iterate on prompts like code
+
+---
+
+## ❗ The Problem
+
+Prompt engineering today is messy:
+
+* You tweak prompts blindly
+* Results vary across models
+* No structured way to evaluate quality
+* No version control for iterations
+* Cost and latency are often ignored
+
+PromptOps solves this by turning prompt engineering into a **repeatable, measurable workflow**.
+
+---
+
+## ✨ Features
+
+### 🧠 Multi-Model Comparison
+
+Run the same prompt across multiple LLMs and compare outputs instantly.
+
+---
+
+### 📊 Evaluation with Test Cases
+
+Define structured test cases and evaluate outputs using AI-based scoring.
+
+---
+
+### 💸 Cost & Latency Tracking
+
+Understand the real-world tradeoffs between models:
+
+* Response time
+* Token usage
+* Estimated cost
+
+
+---
+
+### 🧾 Prompt Versioning
+
+Track prompt iterations and experiment safely without losing previous versions.
+
+---
+
+### 🗂️ Project-Based Workflow
+
+Organize prompts, tests, and experiments into structured projects.
+
+---
+
+## 🏗️ Tech Stack
 
 **Frontend**
-- React 19 + TypeScript
-- Vite 8
-- Tailwind CSS 4 + shadcn/ui
-- React Router DOM
 
-## Features
+* React
+* TypeScript
 
-- **Multi-model comparison** — run the same prompt across multiple models simultaneously
-- **Test case evaluation** — define input/expected output pairs to validate prompt behavior
-- **AI-as-judge scoring** — automatic quality scoring using an LLM evaluator
-- **Cost tracking** — per-token pricing fetched from OpenRouter
-- **Performance metrics** — latency, token counts, and cost per run
-- **Prompt versioning** — iterate on prompts and compare versions
+**Backend**
 
-## Getting Started
+* FastAPI (Python)
 
-### Prerequisites
+**AI Integration**
 
-- Python 3.10+
-- Node 22
-- An [OpenRouter](https://openrouter.ai) API key
+* OpenRouter (multi-model access)
 
-### Backend Setup
+---
+
+## ⚙️ How It Works
+
+1. Create a project
+2. Define a prompt
+3. Select models to test against
+4. Run the prompt
+5. Compare outputs
+6. Evaluate results
+7. Iterate and version
+
+---
+
+## 🧪 Technical Highlights
+
+* Parallel execution across multiple LLM providers
+* Unified interface over different model APIs
+* Token usage and cost estimation
+* AI-as-judge evaluation pipeline
+* Structured prompt versioning system
+* Project-based experiment organization
+
+---
+
+## 🧠 Why This Project Matters
+
+PromptOps is not just a UI wrapper around LLM APIs.
+
+It addresses a real gap in AI development:
+
+> Turning prompt engineering into a **disciplined, testable, and iterative process**
+
+This is especially relevant for:
+
+* AI product development
+* LLM evaluation workflows
+* Cost/performance optimization
+* Prompt reliability and regression testing
+
+---
+
+## 🛠️ Setup
 
 ```bash
-cd src
-python -m venv venv
-source venv/bin/activate
-pip install -r ../requirements.txt
+# Clone the repo
+git clone https://github.com/arnavsaxena62/PromptOps.git
+cd PromptOps
 ```
 
-Create a `.env` file in the project root:
-
-```
-OPENROUTER_API_KEY=your_key_here
-```
-
-Start the API server:
+### Backend
 
 ```bash
-python server.py
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --reload
 ```
 
-The server runs at `http://localhost:8000`. API docs are available at `http://localhost:8000/docs`.
-
-### Frontend Setup
+### Frontend
 
 ```bash
 cd frontend
-source ~/.nvm/nvm.sh && nvm use 22
 npm install
 npm run dev
 ```
 
-### Using as a Python Library
+---
 
-```python
-from models import Project, PromptVersion, ModelConfig, TestCase
+## 🔑 Environment Variables
 
-project = Project("My Chatbot")
-
-project.add_model_config(ModelConfig("openrouter", "openai/gpt-4o-mini"))
-project.add_model_config(ModelConfig("openrouter", "anthropic/claude-3.5-haiku"))
-
-prompt = PromptVersion(version_number=1, content="You are a helpful assistant...")
-project.add_prompt_version(prompt)
-
-test_case = TestCase(
-    prompt_version=prompt,
-    input_text="What is your return policy?",
-    expected_output="You can return items within 30 days...",
-)
-project.add_test_case(test_case)
-
-run = project.create_run(test_case)
-for result in run.results:
-    result.evaluate()
-    print(f"{result.model_config.model_name}: score={result.quality_score}")
-    print(f"  Latency: {result.latency_ms}ms, Cost: ${result.total_cost}")
-```
-
-Run `python main.py` from `src/` for a complete example.
-
-## Project Structure
+Create a `.env` file and add:
 
 ```
-src/
-├── main.py                  # CLI example script
-├── server.py                # FastAPI server entry point
-├── api/
-│   ├── __init__.py
-│   ├── routes.py            # FastAPI endpoints
-│   ├── schemas.py           # Pydantic request/response models
-│   └── store.py             # In-memory project store
-└── models/
-    ├── __init__.py
-    ├── project.py            # Container for prompts, models, test cases, and runs
-    ├── prompt_version.py     # Versioned prompt templates
-    ├── model_config.py       # Model configuration with auto-fetched pricing
-    ├── test_case.py          # Input/expected output pairs for evaluation
-    ├── run.py                # Executes a test case against configured models
-    └── run_result.py         # Per-model result with latency, tokens, cost, and output
-
-frontend/
-├── src/
-│   ├── components/
-│   │   ├── ui/              # shadcn/ui components
-│   │   ├── sidebar.tsx      # Notion-style sidebar
-│   │   └── project-grid.tsx
-│   ├── hooks/
-│   │   ├── use-projects.ts
-│   │   ├── use-prompt-versions.ts
-│   │   ├── use-model-configs.ts
-│   │   ├── use-test-cases.ts
-│   │   └── use-runs.ts
-│   ├── pages/
-│   │   ├── home.tsx             # Project list
-│   │   ├── project-workspace.tsx # Main editor workspace
-│   │   └── run-detail.tsx       # Run results view
-│   └── lib/
-│       ├── config.ts
-│       └── utils.ts
+OPENROUTER_API_KEY=your_api_key_here
 ```
 
-## API Endpoints
+---
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET/POST | `/projects` | List / create projects |
-| GET/DELETE | `/projects/{id}` | Get / delete a project |
-| GET/POST | `/projects/{id}/prompt-versions` | List / create prompt versions |
-| GET/POST | `/projects/{id}/model-configs` | List / create model configs |
-| GET | `/models` | List available OpenRouter models |
-| GET/POST | `/projects/{id}/test-cases` | List / create test cases |
-| GET/POST | `/projects/{id}/runs` | List / create evaluation runs |
-| GET | `/projects/{id}/runs/{run_id}` | Get run details with results |
+## 📌 Roadmap
 
-## RunResult Metrics
+* [ ] Prompt diffing between versions
+* [ ] Batch dataset testing
+* [ ] Prompt regression testing
+* [ ] Shareable experiment links
+* [ ] Custom evaluation criteria
+* [ ] CI-style prompt validation
 
-Each `RunResult` tracks:
+---
 
-| Metric | Description |
-|--------|-------------|
-| `output_text` | Full model response |
-| `latency_ms` | Time to receive response |
-| `prompt_tokens` | Tokens in the request |
-| `response_tokens` | Tokens in the response |
-| `total_cost` | Combined input + output cost |
-| `success` | Whether the API call succeeded |
-| `quality_score` | AI-judged quality score (0.0–1.0) |
+## 🤝 Contributing
+
+Contributions, ideas, and feedback are welcome.
+Feel free to open issues or submit pull requests.
+
+---
+
+## 📄 License
+
+MIT License
+
+---
