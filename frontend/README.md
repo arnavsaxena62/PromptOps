@@ -1,73 +1,69 @@
-# React + TypeScript + Vite
+# PromptOps Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+AI prompt evaluation workspace built with React, TypeScript, and Tailwind CSS.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19 + TypeScript
+- Vite 8
+- Tailwind CSS 4 + shadcn/ui
+- React Router DOM
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+# Use Node 22 (required)
+source ~/.nvm/nvm.sh && nvm use 22
 
-## Expanding the ESLint configuration
+# Install dependencies
+npm install
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# Start dev server
+npm run dev
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Build for production
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Project Structure
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+src/
+├── components/
+│   ├── ui/           # shadcn/ui components
+│   ├── sidebar.tsx   # Notion-style sidebar
+│   └── project-grid.tsx
+├── hooks/
+│   ├── use-projects.ts
+│   ├── use-prompt-versions.ts
+│   ├── use-model-configs.ts
+│   ├── use-test-cases.ts
+│   └── use-runs.ts
+├── pages/
+│   ├── home.tsx            # Project list
+│   ├── project-workspace.tsx  # Main editor workspace
+│   └── run-detail.tsx      # Run results view
+└── lib/
+    ├── config.ts
+    └── utils.ts
+```
+
+## Features
+
+- **Project Management** - Create and browse projects
+- **Prompt Editor** - Edit prompts with version history
+- **Test Cases** - Define inputs and expected outputs
+- **Model Configs** - Configure models for evaluation
+- **Run Evaluation** - Execute prompts against test cases and models
+- **Run Inspection** - View detailed results per model
+
+## API
+
+Proxied to `http://192.168.1.20:8000` in development. See backend docs at `/docs`.
+
+Key endpoints:
+- `GET/POST /projects` - Project CRUD
+- `GET/POST /projects/:id/prompt-versions` - Prompt versions
+- `GET/POST /projects/:id/model-configs` - Model configs
+- `GET/POST /projects/:id/test-cases` - Test cases
+- `GET/POST /projects/:id/runs` - Evaluation runs

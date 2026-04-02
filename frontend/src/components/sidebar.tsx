@@ -1,13 +1,12 @@
 import * as React from "react"
+import { Link, useLocation } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   ChevronDown,
   ChevronRight,
-  FileText,
   Folder,
   Home,
-  Plus,
   Search,
   Settings,
   Trash2,
@@ -26,7 +25,7 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 interface NavItem {
   title: string
   icon: React.ReactNode
-  isActive?: boolean
+  href?: string
   items?: NavItem[]
 }
 
@@ -34,7 +33,7 @@ const navigationItems: NavItem[] = [
   {
     title: "Home",
     icon: <Home className="h-4 w-4" />,
-    isActive: true,
+    href: "/",
   },
   {
     title: "Search",
@@ -52,6 +51,8 @@ const navigationItems: NavItem[] = [
 
 const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
   ({ className, isCollapsed = false, projects = [], ...props }, ref) => {
+    const location = useLocation()
+
     return (
       <div
         ref={ref}
@@ -81,32 +82,14 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
         <nav className="flex-1 overflow-y-auto p-2">
           <div className="space-y-1">
             {navigationItems.map((item) => (
-              <SidebarItem key={item.title} item={item} isCollapsed={isCollapsed} />
+              <SidebarItem
+                key={item.title}
+                item={item}
+                isCollapsed={isCollapsed}
+                isActive={item.href === location.pathname}
+              />
             ))}
           </div>
-
-          {/* Pages Section */}
-          {!isCollapsed && (
-            <div className="mt-6">
-              <div className="flex items-center justify-between px-2 py-1">
-                <span className="text-xs font-medium text-muted-foreground">
-                  Pages
-                </span>
-                <Button variant="ghost" size="icon" className="h-5 w-5">
-                  <Plus className="h-3 w-3" />
-                </Button>
-              </div>
-              <div className="space-y-1">
-                <SidebarItem
-                  item={{
-                    title: "Getting Started",
-                    icon: <FileText className="h-4 w-4" />,
-                  }}
-                  isCollapsed={isCollapsed}
-                />
-              </div>
-            </div>
-          )}
 
           {/* Projects Section */}
           {!isCollapsed && (
@@ -115,9 +98,6 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
                 <span className="text-xs font-medium text-muted-foreground">
                   Projects
                 </span>
-                <Button variant="ghost" size="icon" className="h-5 w-5">
-                  <Plus className="h-3 w-3" />
-                </Button>
               </div>
               <div className="space-y-1">
                 {projects.map((project) => (
@@ -126,24 +106,16 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
                     item={{
                       title: project.name,
                       icon: <Folder className="h-4 w-4" />,
+                      href: `/project/${project.id}`,
                     }}
                     isCollapsed={isCollapsed}
+                    isActive={location.pathname === `/project/${project.id}`}
                   />
                 ))}
               </div>
             </div>
           )}
         </nav>
-
-        {/* Footer */}
-        {!isCollapsed && (
-          <div className="border-t p-2">
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <Plus className="h-4 w-4" />
-              New Page
-            </Button>
-          </div>
-        )}
       </div>
     )
   }
@@ -153,33 +125,42 @@ Sidebar.displayName = "Sidebar"
 interface SidebarItemProps {
   item: NavItem
   isCollapsed?: boolean
+  isActive?: boolean
 }
 
-function SidebarItem({ item, isCollapsed }: SidebarItemProps) {
+function SidebarItem({ item, isCollapsed, isActive }: SidebarItemProps) {
   const [isExpanded, setIsExpanded] = React.useState(false)
   const hasItems = item.items && item.items.length > 0
 
+  const content = (
+    <Button
+      variant={isActive ? "secondary" : "ghost"}
+      className={cn(
+        "w-full justify-start gap-2",
+        isCollapsed && "justify-center px-2"
+      )}
+      onClick={() => hasItems && setIsExpanded(!isExpanded)}
+    >
+      {item.icon}
+      {!isCollapsed && <span className="truncate">{item.title}</span>}
+      {hasItems && !isCollapsed && (
+        <ChevronRight
+          className={cn(
+            "ml-auto h-4 w-4 transition-transform",
+            isExpanded && "rotate-90"
+          )}
+        />
+      )}
+    </Button>
+  )
+
   return (
     <div>
-      <Button
-        variant={item.isActive ? "secondary" : "ghost"}
-        className={cn(
-          "w-full justify-start gap-2",
-          isCollapsed && "justify-center px-2"
-        )}
-        onClick={() => hasItems && setIsExpanded(!isExpanded)}
-      >
-        {item.icon}
-        {!isCollapsed && <span>{item.title}</span>}
-        {hasItems && !isCollapsed && (
-          <ChevronRight
-            className={cn(
-              "ml-auto h-4 w-4 transition-transform",
-              isExpanded && "rotate-90"
-            )}
-          />
-        )}
-      </Button>
+      {item.href ? (
+        <Link to={item.href}>{content}</Link>
+      ) : (
+        content
+      )}
       {hasItems && isExpanded && !isCollapsed && (
         <div className="ml-4 space-y-1">
           {item.items?.map((subItem) => (

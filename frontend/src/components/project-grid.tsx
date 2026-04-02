@@ -1,4 +1,5 @@
 import * as React from "react"
+import { Link } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Folder, MoreHorizontal, Play, FileText, Cog, TestTube } from "lucide-react"
@@ -82,41 +83,43 @@ interface ProjectCardProps {
 
 function ProjectCard({ project }: ProjectCardProps) {
   return (
-    <Card className="group relative transition-shadow hover:shadow-md">
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-2">
-            <Folder className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-base">{project.name}</CardTitle>
+    <Link to={`/project/${project.id}`}>
+      <Card className="group relative cursor-pointer transition-shadow hover:shadow-md">
+        <CardHeader className="pb-2">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-2">
+              <Folder className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-base">{project.name}</CardTitle>
+            </div>
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => e.preventDefault()}>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
-            <Button variant="ghost" size="icon" className="h-7 w-7">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <FileText className="h-3 w-3" />
+              <span>{project.prompt_version_count} prompts</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Cog className="h-3 w-3" />
+              <span>{project.model_config_count} models</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <TestTube className="h-3 w-3" />
+              <span>{project.test_case_count} tests</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Play className="h-3 w-3" />
+              <span>{project.run_count} runs</span>
+            </div>
           </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <FileText className="h-3 w-3" />
-            <span>{project.prompt_version_count} prompts</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Cog className="h-3 w-3" />
-            <span>{project.model_config_count} models</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <TestTube className="h-3 w-3" />
-            <span>{project.test_case_count} tests</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Play className="h-3 w-3" />
-            <span>{project.run_count} runs</span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Link>
   )
 }
 
