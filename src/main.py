@@ -48,21 +48,22 @@ def main():
         run = project.create_run(tc)
 
         for result in run.results:
+            result.evaluate()
+
             name = result.model_config.model_name
             status = "OK" if result.success else f"FAIL"
             error_info = (
                 f"\n    Error: {result.error_message}" if result.error_message else ""
             )
 
-            expected_lower = (tc.expected_output or "").lower()
-            output_lower = result.output_text.lower()
-            match = expected_lower in output_lower or output_lower in expected_lower
-            match_str = "MATCH" if match else "NO MATCH"
+            match_str = "MATCH" if result.quality_score >= 0.7 else "NO MATCH"
 
             print(f"  Model:    {name}")
             print(f"  Status:   {status}{error_info}")
+            print(f"  Score:    {result.quality_score}")
             print(f"  Match:    {match_str}")
-            print(f'  Output:   "{result.output_text}"')
+            output_display = result.output_text[:120] + "..." if len(result.output_text) > 120 else result.output_text
+            print(f'  Output:   "{output_display}"')
             print(f"  Latency:  {result.latency_ms:.1f}ms")
             print(
                 f"  Tokens:   {result.prompt_tokens} in / {result.response_tokens} out"

@@ -26,6 +26,8 @@ class Project:
         self.runs = []
 
     def add_prompt_version(self, prompt_version) -> None:
+        if any(pv.version_number == prompt_version.version_number for pv in self.prompt_versions):
+            raise ValueError(f"Prompt version {prompt_version.version_number} already exists")
         prompt_version.project = self
         prompt_version.project_id = self.id
         self.prompt_versions.append(prompt_version)

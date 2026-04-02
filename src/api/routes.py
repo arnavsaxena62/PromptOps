@@ -59,8 +59,11 @@ def add_prompt_version(project_id: str, body: PromptVersionCreate):
     project = get_project(project_id)
     if not project:
         raise HTTPException(404, "Project not found")
-    pv = PromptVersion(version_number=body.version_number, content=body.content)
-    project.add_prompt_version(pv)
+    try:
+        pv = PromptVersion(version_number=body.version_number, content=body.content)
+        project.add_prompt_version(pv)
+    except ValueError as e:
+        raise HTTPException(409, str(e))
     return _pv_to_response(pv)
 
 
