@@ -6,8 +6,8 @@
 
 ## 🖼️ Preview
 
-![PromptOps Hero UI](./assets/hero.png)
-![PromptOps project view UI](./assets/hero2.png)
+![PromptOps Hero UI](./asset/hero.png)
+![PromptOps project view UI](./asset/hero2.png)
 
 ---
 
