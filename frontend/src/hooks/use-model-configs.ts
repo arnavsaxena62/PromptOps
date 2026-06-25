@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 
+import { apiFetch } from "@/lib/config"
+
 interface ModelConfig {
   id: string
   project_id: string
@@ -28,7 +30,7 @@ export function useModelConfigs(projectId: string): UseModelConfigsResult {
     setError(null)
 
     try {
-      const response = await fetch(`/projects/${projectId}/model-configs`)
+      const response = await apiFetch(`/projects/${projectId}/model-configs`)
       if (!response.ok) {
         throw new Error(`Failed to fetch model configs: ${response.statusText}`)
       }
@@ -42,7 +44,7 @@ export function useModelConfigs(projectId: string): UseModelConfigsResult {
   }, [projectId])
 
   const createConfig = useCallback(async (provider: string, model_name: string): Promise<ModelConfig> => {
-    const response = await fetch(`/projects/${projectId}/model-configs`, {
+    const response = await apiFetch(`/projects/${projectId}/model-configs`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ provider, model_name }),

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { apiFetch } from "@/lib/config"
 import { Sidebar } from "@/components/sidebar"
 import { ProjectGrid } from "@/components/project-grid"
 import { useProjects } from "@/hooks/use-projects"

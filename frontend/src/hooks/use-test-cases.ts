@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
+import { apiFetch } from "@/lib/config"
+
 
 interface TestCase {
   id: string
@@ -28,7 +30,7 @@ export function useTestCases(projectId: string): UseTestCasesResult {
     setError(null)
 
     try {
-      const response = await fetch(`/projects/${projectId}/test-cases`)
+      const response = await apiFetch(`/projects/${projectId}/test-cases`)
       if (!response.ok) {
         throw new Error(`Failed to fetch test cases: ${response.statusText}`)
       }
@@ -42,7 +44,7 @@ export function useTestCases(projectId: string): UseTestCasesResult {
   }, [projectId])
 
   const createTestCase = useCallback(async (prompt_version_id: string, input_text: string, expected_output?: string): Promise<TestCase> => {
-    const response = await fetch(`/projects/${projectId}/test-cases`, {
+    const response = await apiFetch(`/projects/${projectId}/test-cases`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt_version_id, input_text, expected_output }),

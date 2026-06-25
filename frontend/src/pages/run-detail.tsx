@@ -19,7 +19,7 @@ import {
   X,
   Zap,
 } from "lucide-react"
-
+import { apiFetch } from "@/lib/config"
 interface RunResult {
   id: string
   model_config_id: string
@@ -61,14 +61,14 @@ export default function RunDetail() {
         if (batchRunIds.length > 0) {
           const fetchedRuns: Run[] = []
           for (const id of batchRunIds) {
-            const response = await fetch(`/projects/${projectId}/runs/${id}`)
+            const response = await apiFetch(`/projects/${projectId}/runs/${id}`)
             if (response.ok) {
               fetchedRuns.push(await response.json())
             }
           }
           setRuns(fetchedRuns)
         } else {
-          const response = await fetch(`/projects/${projectId}/runs/${runId}`)
+          const response = await apiFetch(`/projects/${projectId}/runs/${runId}`)
           if (response.ok) {
             const data = await response.json()
             setRuns([data])

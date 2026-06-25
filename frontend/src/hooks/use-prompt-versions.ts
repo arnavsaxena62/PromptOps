@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 
+import { apiFetch } from "@/lib/config"
+
 interface PromptVersion {
   id: string
   project_id: string
@@ -27,7 +29,7 @@ export function usePromptVersions(projectId: string): UsePromptVersionsResult {
     setError(null)
 
     try {
-      const response = await fetch(`/projects/${projectId}/prompt-versions`)
+      const response = await apiFetch(`/projects/${projectId}/prompt-versions`)
       if (!response.ok) {
         throw new Error(`Failed to fetch prompt versions: ${response.statusText}`)
       }
@@ -41,7 +43,7 @@ export function usePromptVersions(projectId: string): UsePromptVersionsResult {
   }, [projectId])
 
   const createVersion = useCallback(async (version_number: number, content: string): Promise<PromptVersion> => {
-    const response = await fetch(`/projects/${projectId}/prompt-versions`, {
+    const response = await apiFetch(`/projects/${projectId}/prompt-versions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ version_number, content }),

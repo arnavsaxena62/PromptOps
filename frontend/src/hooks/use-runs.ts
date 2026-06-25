@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 
+import { apiFetch } from "@/lib/config"
+
 interface RunResult {
   id: string
   model_config_id: string
@@ -43,7 +45,7 @@ export function useRuns(projectId: string): UseRunsResult {
     setError(null)
 
     try {
-      const response = await fetch(`/projects/${projectId}/runs`)
+      const response = await apiFetch(`/projects/${projectId}/runs`)
       if (!response.ok) {
         throw new Error(`Failed to fetch runs: ${response.statusText}`)
       }
@@ -57,7 +59,7 @@ export function useRuns(projectId: string): UseRunsResult {
   }, [projectId])
 
   const executeRun = useCallback(async (test_case_id: string, model_config_ids?: string[]): Promise<Run> => {
-    const response = await fetch(`/projects/${projectId}/runs`, {
+    const response = await apiFetch(`/projects/${projectId}/runs`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ test_case_id, model_config_ids }),
@@ -73,7 +75,7 @@ export function useRuns(projectId: string): UseRunsResult {
   }, [projectId])
 
   const executeBatchRun = useCallback(async (test_case_ids: string[], model_config_ids?: string[]): Promise<Run[]> => {
-    const response = await fetch(`/projects/${projectId}/runs/batch`, {
+    const response = await apiFetch(`/projects/${projectId}/runs/batch`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ test_case_ids, model_config_ids }),

@@ -1,3 +1,5 @@
+
+import { apiFetch } from "@/lib/config"
 import { useState, useEffect } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
 import { cn } from "@/lib/utils"
@@ -93,7 +95,7 @@ export default function ProjectWorkspace() {
   useEffect(() => {
     async function fetchProject() {
       try {
-        const response = await fetch(`/projects/${projectId}`)
+        const response = await apiFetch(`/projects/${projectId}`)
         if (response.ok) {
           const data = await response.json()
           setProject(data)
@@ -285,7 +287,7 @@ export default function ProjectWorkspace() {
                   <Button onClick={async () => {
                     try {
                       console.log("new");
-                      const res = await fetch(`/api`, {
+                      const res = await apiFetch(`/api`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ key: apiKey })

@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 
+import { apiFetch } from "@/lib/config"
+
 interface Project {
   id: string
   name: string
@@ -27,7 +29,7 @@ export function useProjects(): UseProjectsResult {
     setError(null)
 
     try {
-      const response = await fetch(`/projects`)
+      const response = await apiFetch(`/projects`)
       if (!response.ok) {
         throw new Error(`Failed to fetch projects: ${response.statusText}`)
       }
@@ -41,7 +43,7 @@ export function useProjects(): UseProjectsResult {
   }, [])
 
   const createProject = useCallback(async (name: string): Promise<Project> => {
-    const response = await fetch(`/projects`, {
+    const response = await apiFetch(`/projects`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
