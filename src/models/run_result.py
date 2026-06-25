@@ -10,8 +10,8 @@ if TYPE_CHECKING:
     from models.run import Run
 from models.model_config import ModelConfig
 
-load_dotenv()
 
+load_dotenv("../.env")
 
 @dataclass
 class RunResult:

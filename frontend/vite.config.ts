@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/projects': {
-        target: 'http://192.168.1.20:8000',
+        target: 'http://192.168.1.15:8000',
         changeOrigin: true,
       },
     },

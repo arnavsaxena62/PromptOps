@@ -1,5 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from typing import Optional
+from fastapi.middleware.cors import CORSMiddleware
+import os
+
 import requests
 from api.store import (
     create_project,
@@ -25,12 +28,27 @@ from api.schemas import (
     BatchRunCreate,
     BatchRunResponse,
     OpenRouterModel,
+    ApiCreation,
+    ApiKeyRequest
 )
 
 app = FastAPI(
+
     title="PromptOps", description="Prompt development and model comparison API"
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # or ["*"] during dev
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.on_event("startup")
+def print_routes():
+    for route in app.routes:
+        print(route.path)
 
 @app.get("/projects", response_model=list[ProjectResponse])
 def get_all_projects():
@@ -42,6 +60,10 @@ def create_new_project(body: ProjectCreate):
     project = create_project(body.name)
     return _project_to_response(project)
 
+@app.post("/api", response_model=ApiCreation)
+def keyAddition(body: ApiKeyRequest):
+    os.environ["OPENROUTER_API_KEY"] = body.key
+    return ApiCreation(success=True)
 
 @app.get("/projects/{project_id}", response_model=ProjectResponse)
 def get_project_details(project_id: str):
@@ -231,7 +253,6 @@ def _project_to_response(p) -> ProjectResponse:
         test_case_count=len(p.test_cases),
         run_count=len(p.runs),
     )
-
 
 def _pv_to_response(pv) -> PromptVersionResponse:
     return PromptVersionResponse(

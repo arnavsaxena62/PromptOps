@@ -29,6 +29,7 @@ import {
   ArrowLeft,
   Beaker,
   Cpu,
+  KeyIcon,
   FileText,
   FlaskConical,
   Loader2,
@@ -84,6 +85,9 @@ export default function ProjectWorkspace() {
   const [isCreatingModel, setIsCreatingModel] = useState(false)
 
   const [isRunning, setIsRunning] = useState(false)
+  // API key dialog state
+  const [apiKey, setApiKey] = useState('')
+  const [isApiKeyDialogOpen, setIsApiKeyDialogOpen] = useState(false)
 
   // Fetch project details
   useEffect(() => {
@@ -261,10 +265,43 @@ export default function ProjectWorkspace() {
           </div>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <Button size="sm" onClick={handleRun} disabled={isRunning || selectedTestCaseIds.size === 0}>
-            <Play className="mr-2 h-4 w-4" />
-            {isRunning ? "Running..." : "Run Evaluation"}
-          </Button>
+            <Button size="sm" onClick={() => setIsApiKeyDialogOpen(true)}>
+              <KeyIcon className="mr-2 h-4 w-4" /> Set API Key
+            </Button>
+            <Dialog open={isApiKeyDialogOpen} onOpenChange={setIsApiKeyDialogOpen}>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Enter API Key</DialogTitle>
+                  <DialogDescription>Provide your API key to authenticate requests.</DialogDescription>
+                </DialogHeader>
+                <div className="py-4">
+                  <Input
+                    placeholder="API Key"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                  />
+                </div>
+                <DialogFooter>
+                  <Button onClick={async () => {
+                    try {
+                      console.log("new");
+                      const res = await fetch(`/api`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ key: apiKey })
+                      });
+                      console.log("ngabal", res.status);
+                      if (!res.ok) throw new Error('Failed');
+                    } catch (e) {
+                      console.error(e);
+                    }
+                    setIsApiKeyDialogOpen(false);
+                  }}>
+                    Save
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
         </div>
       </header>
 

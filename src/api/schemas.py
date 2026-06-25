@@ -18,6 +18,9 @@ class ProjectResponse(BaseModel):
         from_attributes = True
 
 
+class ApiCreation(BaseModel):
+    success:bool
+
 class PromptVersionCreate(BaseModel):
     version_number: int
     content: str
@@ -32,6 +35,11 @@ class PromptVersionResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ApiKeyRequest(BaseModel):
+    key: str
+
+
 
 
 class ModelConfigCreate(BaseModel):
