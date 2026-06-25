@@ -1,6 +1,5 @@
 import * as React from "react"
 
-import { apiFetch } from "@/lib/config"
 import { Link } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"

@@ -1,6 +1,4 @@
 import * as React from "react"
-
-import { apiFetch } from "@/lib/config"
 import { Link, useLocation } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
